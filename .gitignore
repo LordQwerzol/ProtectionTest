@@ -1,0 +1,12 @@
+### IDE ###
+.qtcreator/
+.vscode
+
+### Assembly artifacts ###
+**/build/
+
+### Help file ###
+help.md
+
+### Term paper ###
+Курсовая работа ***.docx
