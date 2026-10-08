@@ -15,7 +15,11 @@ qt_add_executable(ProtectionTest
     src/main.cpp
     src/mainwindow.cpp
     src/mainslots.cpp
-    include/mainwindow.h
+    src/securitycenter.cpp
+    src/util.cpp
+    include/mainwindow.h 
+    include/securitycenter.h
+    include/util.h
     ui/mainwindow.ui
     ${APP_RESOURCES}
     ${APP_ICON_RC}
@@ -38,6 +42,10 @@ target_link_libraries(ProtectionTest
 
 if(MSVC)
     target_compile_options(ProtectionTest PRIVATE /utf-8)
+endif()
+
+if (WIN32)
+    target_link_libraries(ProtectionTest PRIVATE ole32 oleaut32 wbemuuid)
 endif()
 
 install(TARGETS ProtectionTest

@@ -12,6 +12,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->navLog,      &QPushButton::clicked, this, [this]{ ui->pages->setCurrentIndex(1); });
     connect(ui->navReport,   &QPushButton::clicked, this, [this]{ ui->pages->setCurrentIndex(2); });
     connect(ui->btnCheckNet, &QPushButton::clicked, this, &MainWindow::checkInternet);
+    connect(ui->btnCheckFwInstalled, &QPushButton::clicked, this, &MainWindow::checkFirewallInstalled);
+    connect(ui->btnCheckAvInstalled, &QPushButton::clicked, this, &MainWindow::checkAntivirusInstalled);
 }
 
 MainWindow::~MainWindow()
