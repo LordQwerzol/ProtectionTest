@@ -1,10 +1,14 @@
 cmake_minimum_required(VERSION 3.19)
 project(ProtectionTest LANGUAGES CXX)
 
+set(APP_ICON_RC "${CMAKE_CURRENT_SOURCE_DIR}/resources/app_icon.rc")
+
 find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets)
 
 qt_standard_project_setup()
 include(GNUInstallDirs)
+
+qt_add_resources(APP_RESOURCES resources.qrc)
 
 qt_add_executable(ProtectionTest
     WIN32 MACOSX_BUNDLE
@@ -12,6 +16,8 @@ qt_add_executable(ProtectionTest
     src/mainwindow.cpp
     include/mainwindow.h
     ui/mainwindow.ui
+    ${APP_RESOURCES}
+    ${APP_ICON_RC}
 )
 
 target_include_directories(ProtectionTest PRIVATE
