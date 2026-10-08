@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QFrame>
 #include <QLabel>
+#include <QMap>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -19,9 +20,18 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
+private slots:
+    void checkInternet();
+
 private:
     Ui::MainWindow *ui;
 
     void setCardState(QFrame *card, QLabel *pill, const QString &state, const QString &text);
+
+    void addLog(const QString &message);
+    void updateSummary();
+    
+    // Переменная для отчета ?
+    QMap<QString, bool> m_results;
 };
 #endif // MAINWINDOW_H

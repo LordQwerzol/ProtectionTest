@@ -476,7 +476,7 @@ QToolTip { background: #232a36; color: #e5e7eb; border: 1px solid #343c4a; }</st
              <item>
               <widget class="QLabel" name="descNet">
                <property name="text">
-                <string>Ping до 8.8.8.8</string>
+                <string>Ping до 77.88.8.8</string>
                </property>
                <property name="wordWrap">
                 <bool>true</bool>

@@ -3,7 +3,7 @@ project(ProtectionTest LANGUAGES CXX)
 
 set(APP_ICON_RC "${CMAKE_CURRENT_SOURCE_DIR}/resources/app_icon.rc")
 
-find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets)
+find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets Network)
 
 qt_standard_project_setup()
 include(GNUInstallDirs)
@@ -14,6 +14,7 @@ qt_add_executable(ProtectionTest
     WIN32 MACOSX_BUNDLE
     src/main.cpp
     src/mainwindow.cpp
+    src/mainslots.cpp
     include/mainwindow.h
     ui/mainwindow.ui
     ${APP_RESOURCES}
@@ -32,6 +33,7 @@ target_link_libraries(ProtectionTest
     PRIVATE
         Qt::Core
         Qt::Widgets
+        Qt6::Network
 )
 
 if(MSVC)
