@@ -6,44 +6,258 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>608</width>
-    <height>453</height>
+    <width>934</width>
+    <height>620</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>900</width>
+    <height>620</height>
+   </size>
+  </property>
   <property name="windowTitle">
-   <string>Программа проверки информационной безопасности</string>
+   <string>ProtectionTest - контроль средств защиты ПК</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../resources.qrc">
     <normaloff>:/rec/resources/appIcon.png</normaloff>:/rec/resources/appIcon.png</iconset>
   </property>
+  <property name="styleSheet">
+   <string>QMainWindow, QWidget#centralwidget { background: #0f1117; }
+* { font-family: &quot;Segoe UI&quot;; font-size: 10pt; color: #e5e7eb; }
+
+/* Боковое меню */
+QFrame#sidebar { background: #151922; border-right: 1px solid #242a35; }
+QLabel#appLogo { font-size: 12pt; font-weight: 600; color: #60a5fa; padding: 4px 2px 14px 2px; }
+QPushButton[nav=&quot;true&quot;] { text-align: left; padding: 8px 12px; border: none; border-radius: 8px; color: #9ca3af; background: transparent; }
+QPushButton[nav=&quot;true&quot;]:hover { background: #1f2430; }
+QPushButton[nav=&quot;true&quot;]:checked { background: #1c2a45; color: #60a5fa; }
+
+/* Общий статус */
+QFrame#heroCard { background: #181d27; border: 1px solid #262c38; border-radius: 12px; }
+QLabel#scoreLabel { border: 5px solid #374151; border-radius: 34px; font-size: 14pt; font-weight: 600; background: transparent; }
+QLabel#scoreLabel[state=&quot;ok&quot;]  { border-color: #22c55e; }
+QLabel#scoreLabel[state=&quot;bad&quot;] { border-color: #ef4444; }
+QLabel#heroTitle { font-size: 13pt; font-weight: 600; background: transparent; }
+QLabel#heroSubtitle { color: #9ca3af; background: transparent; }
+QPushButton#btnRunAll { background: #3b82f6; color: #ffffff; border: none; border-radius: 8px; padding: 9px 18px; font-weight: 600; }
+QPushButton#btnRunAll:hover { background: #2563eb; }
+QPushButton#btnRunAll:disabled { background: #1e3a8a; color: #93a3c0; }
+
+/* Карточки проверок */
+QFrame[card=&quot;true&quot;] { background: #181d27; border: 1px solid #262c38; border-radius: 12px; }
+QFrame[card=&quot;true&quot;][state=&quot;bad&quot;] { border: 1px solid #7f1d1d; }
+QFrame#cardSummary { border: 1px dashed #343c4a; background: #141821; }
+QFrame[card=&quot;true&quot;] QLabel { background: transparent; border: none; }
+QFrame[card=&quot;true&quot;] QLabel[icon=&quot;true&quot;] { background: #232a36; border-radius: 8px; font-size: 14pt; }
+QLabel[cardTitle=&quot;true&quot;] { font-weight: 600; }
+QLabel[cardDesc=&quot;true&quot;] { color: #9ca3af; font-size: 9pt; }
+QFrame[card=&quot;true&quot;] QLabel[pill=&quot;true&quot;] { border-radius: 9px; padding: 2px 9px; font-size: 8pt; background: #262c38; color: #9ca3af; }
+QFrame[card=&quot;true&quot;] QLabel[pill=&quot;true&quot;][state=&quot;run&quot;] { background: #3a2c0c; color: #fbbf24; }
+QFrame[card=&quot;true&quot;] QLabel[pill=&quot;true&quot;][state=&quot;ok&quot;]  { background: #0e2d1b; color: #4ade80; }
+QFrame[card=&quot;true&quot;] QLabel[pill=&quot;true&quot;][state=&quot;bad&quot;] { background: #3b1414; color: #f87171; }
+QPushButton[cardButton=&quot;true&quot;] { background: #1f2530; border: 1px solid #343c4a; border-radius: 6px; padding: 5px 10px; }
+QPushButton[cardButton=&quot;true&quot;]:hover { background: #283040; }
+QPushButton[cardButton=&quot;true&quot;]:disabled { color: #4b5563; }
+
+/* Журнал и отчёт */
+QFrame#logCard { background: #181d27; border: 1px solid #262c38; border-radius: 12px; }
+QLabel[sectionTitle=&quot;true&quot;] { font-weight: 600; background: transparent; }
+QLabel#logPageTitle, QLabel#reportPageTitle { font-size: 15pt; font-weight: 600; }
+QPlainTextEdit, QTextBrowser { background: #141821; border: 1px solid #262c38; color: #cbd5e1; selection-background-color: #1d4ed8; border-radius: 8px; padding: 6px; font-family: &quot;Consolas&quot;; font-size: 9pt; }
+QFrame#logCard QPlainTextEdit { border: none; background: #181d27; }
+QPushButton[secondary=&quot;true&quot;] { background: #1f2530; border: 1px solid #343c4a; border-radius: 8px; padding: 7px 14px; }
+QPushButton[secondary=&quot;true&quot;]:hover { background: #283040; }
+QStatusBar { background: #151922; border-top: 1px solid #242a35; color: #9ca3af; }
+QProgressBar { border: none; background: #262c38; border-radius: 3px; max-height: 6px; }
+QProgressBar::chunk { background: #3b82f6; border-radius: 3px; }
+
+QScrollBar:vertical { background: transparent; width: 10px; }
+QScrollBar::handle:vertical { background: #343c4a; border-radius: 5px; min-height: 24px; }
+QScrollBar::add-line, QScrollBar::sub-line { height: 0; }
+QToolTip { background: #232a36; color: #e5e7eb; border: 1px solid #343c4a; }</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <layout class="QHBoxLayout" name="rootLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item>
-     <widget class="QGroupBox" name="groupBox">
-      <property name="title">
-       <string>Сетевое подключение </string>
+     <widget class="QFrame" name="sidebar">
+      <property name="minimumSize">
+       <size>
+        <width>200</width>
+        <height>0</height>
+       </size>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="maximumSize">
+       <size>
+        <width>200</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="acceptDrops">
+       <bool>false</bool>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QPushButton" name="cmdCheckInternet">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QLabel" name="appLogo_2">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap resource="../resources.qrc">:/rec/resources/appIcon.png</pixmap>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="appLogo">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTipDuration">
+            <number>0</number>
+           </property>
+           <property name="text">
+            <string>ProtectionTest</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::TextFormat::PlainText</enum>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignBottom|Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QPushButton" name="navOverview">
          <property name="cursor">
           <cursorShape>PointingHandCursor</cursorShape>
          </property>
          <property name="text">
-          <string>Проверка подключения к Интернету</string>
+          <string>  Обзор</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../resources.qrc">
+           <normaloff>:/rec/resources/Home.png</normaloff>:/rec/resources/Home.png</iconset>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+         <property name="nav" stdset="0">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="txtCheckInternet">
-         <property name="readOnly">
+        <widget class="QPushButton" name="navLog">
+         <property name="cursor">
+          <cursorShape>PointingHandCursor</cursorShape>
+         </property>
+         <property name="text">
+          <string>  Журнал</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../resources.qrc">
+           <normaloff>:/rec/resources/Log.png</normaloff>:/rec/resources/Log.png</iconset>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+         <property name="nav" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="navReport">
+         <property name="cursor">
+          <cursorShape>PointingHandCursor</cursorShape>
+         </property>
+         <property name="text">
+          <string>  Отчёт</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../resources.qrc">
+           <normaloff>:/rec/resources/Report.png</normaloff>:/rec/resources/Report.png</iconset>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+         <property name="nav" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="sidebarSpacer">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnExit">
+         <property name="cursor">
+          <cursorShape>PointingHandCursor</cursorShape>
+         </property>
+         <property name="text">
+          <string>  Выход</string>
+         </property>
+         <property name="icon">
+          <iconset theme="QIcon::ThemeIcon::SystemLogOut"/>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>false</bool>
+         </property>
+         <property name="nav" stdset="0">
           <bool>true</bool>
          </property>
         </widget>
@@ -52,181 +266,1016 @@
      </widget>
     </item>
     <item>
-     <widget class="QGroupBox" name="groupBox_2">
-      <property name="title">
-       <string>Межсетевой экран</string>
+     <widget class="QStackedWidget" name="pages">
+      <property name="currentIndex">
+       <number>0</number>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_3">
-         <item>
-          <widget class="QPushButton" name="cmdChecIsFirewall">
-           <property name="cursor">
-            <cursorShape>PointingHandCursor</cursorShape>
+      <widget class="QWidget" name="pageOverview">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QFrame" name="heroCard">
+          <layout class="QHBoxLayout" name="heroLayout">
+           <property name="spacing">
+            <number>16</number>
            </property>
-           <property name="text">
-            <string>Проверка наличия МЭ</string>
+           <property name="leftMargin">
+            <number>16</number>
            </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="cmdCheckWorkFirewall">
-           <property name="cursor">
-            <cursorShape>PointingHandCursor</cursorShape>
+           <property name="topMargin">
+            <number>16</number>
            </property>
-           <property name="text">
-            <string>Проверка работоспосбности МЭ</string>
+           <property name="rightMargin">
+            <number>16</number>
            </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_4">
-         <item>
-          <widget class="QLineEdit" name="txtChecIsFirewall">
-           <property name="readOnly">
-            <bool>true</bool>
+           <property name="bottomMargin">
+            <number>16</number>
            </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="txtCheckWorkFirewall">
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item>
-     <widget class="QGroupBox" name="groupBox_3">
-      <property name="title">
-       <string>Антивирусное ПО</string>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_4">
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_5">
-         <item>
-          <widget class="QPushButton" name="cmdCheckIsAntivirus">
-           <property name="cursor">
-            <cursorShape>PointingHandCursor</cursorShape>
-           </property>
-           <property name="text">
-            <string>Проверка наличия Антивируса</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="cmdCheckEicar">
-           <property name="cursor">
-            <cursorShape>PointingHandCursor</cursorShape>
-           </property>
-           <property name="text">
-            <string>Тест EICAR</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_6">
-         <item>
-          <widget class="QLineEdit" name="txtCheckIsAntivirus">
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="txtCheckEicar">
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item>
-     <widget class="QGroupBox" name="groupBox_4">
-      <property name="title">
-       <string>Результаты проверки и рекомендации</string>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QTextBrowser" name="txtRezult"/>
-       </item>
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <item>
-          <widget class="QPushButton" name="cmdRunAll">
-           <property name="cursor">
-            <cursorShape>PointingHandCursor</cursorShape>
-           </property>
-           <property name="text">
-            <string>Запустить все</string>
-           </property>
-           <property name="icon">
-            <iconset theme="QIcon::ThemeIcon::MediaPlaybackStart"/>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="cmdGetRezult">
-           <property name="cursor">
-            <cursorShape>PointingHandCursor</cursorShape>
-           </property>
-           <property name="text">
-            <string>Вывести результаты</string>
-           </property>
-           <property name="icon">
-            <iconset theme="QIcon::ThemeIcon::InsertImage"/>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="cmdSaveFile">
-           <property name="cursor">
-            <cursorShape>PointingHandCursor</cursorShape>
-           </property>
-           <property name="text">
-            <string>Сохранить в файл</string>
-           </property>
-           <property name="icon">
-            <iconset theme="QIcon::ThemeIcon::DocumentSave"/>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="cmdClearAll">
-           <property name="cursor">
-            <cursorShape>PointingHandCursor</cursorShape>
-           </property>
-           <property name="text">
-            <string>Очстить</string>
-           </property>
-           <property name="icon">
-            <iconset theme="QIcon::ThemeIcon::EditClear"/>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
+           <item>
+            <widget class="QLabel" name="scoreLabel">
+             <property name="minimumSize">
+              <size>
+               <width>68</width>
+               <height>68</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>68</width>
+               <height>68</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>0/5</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignmentFlag::AlignCenter</set>
+             </property>
+             <property name="state" stdset="0">
+              <string>none</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="heroTextLayout">
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="heroTitle">
+               <property name="text">
+                <string>Проверка ещё не выполнялась</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignBottom|Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="heroSubtitle">
+               <property name="text">
+                <string>Запустите полную проверку средств защиты</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+               </property>
+               <property name="wordWrap">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnRunAll">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="cursor">
+              <cursorShape>PointingHandCursor</cursorShape>
+             </property>
+             <property name="text">
+              <string>Полная проверка</string>
+             </property>
+             <property name="icon">
+              <iconset theme="QIcon::ThemeIcon::MediaPlaybackStart"/>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QFrame" name="cardNet">
+            <property name="minimumSize">
+             <size>
+              <width>200</width>
+              <height>150</height>
+             </size>
+            </property>
+            <property name="card" stdset="0">
+             <bool>true</bool>
+            </property>
+            <property name="state" stdset="0">
+             <string>none</string>
+            </property>
+            <layout class="QVBoxLayout" name="layNet">
+             <property name="spacing">
+              <number>6</number>
+             </property>
+             <property name="leftMargin">
+              <number>14</number>
+             </property>
+             <property name="topMargin">
+              <number>12</number>
+             </property>
+             <property name="rightMargin">
+              <number>14</number>
+             </property>
+             <property name="bottomMargin">
+              <number>12</number>
+             </property>
+             <item>
+              <layout class="QHBoxLayout" name="topNet">
+               <item>
+                <widget class="QLabel" name="iconNet">
+                 <property name="minimumSize">
+                  <size>
+                   <width>36</width>
+                   <height>36</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>36</width>
+                   <height>36</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="pixmap">
+                  <pixmap resource="../resources.qrc">:/rec/resources/Net.png</pixmap>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
+                 </property>
+                 <property name="icon" stdset="0">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="spNet">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLabel" name="statusNet">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>22</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Не проверено</string>
+                 </property>
+                 <property name="pill" stdset="0">
+                  <bool>true</bool>
+                 </property>
+                 <property name="state" stdset="0">
+                  <string>none</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QLabel" name="titleNet">
+               <property name="text">
+                <string>Интернет</string>
+               </property>
+               <property name="cardTitle" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="descNet">
+               <property name="text">
+                <string>Ping до 8.8.8.8</string>
+               </property>
+               <property name="wordWrap">
+                <bool>true</bool>
+               </property>
+               <property name="cardDesc" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="vspNet">
+               <property name="orientation">
+                <enum>Qt::Orientation::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnCheckNet">
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
+               <property name="text">
+                <string>Проверить</string>
+               </property>
+               <property name="cardButton" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFrame" name="cardFwInstalled">
+            <property name="minimumSize">
+             <size>
+              <width>200</width>
+              <height>150</height>
+             </size>
+            </property>
+            <property name="card" stdset="0">
+             <bool>true</bool>
+            </property>
+            <property name="state" stdset="0">
+             <string>none</string>
+            </property>
+            <layout class="QVBoxLayout" name="layFwInstalled">
+             <property name="spacing">
+              <number>6</number>
+             </property>
+             <property name="leftMargin">
+              <number>14</number>
+             </property>
+             <property name="topMargin">
+              <number>12</number>
+             </property>
+             <property name="rightMargin">
+              <number>14</number>
+             </property>
+             <property name="bottomMargin">
+              <number>12</number>
+             </property>
+             <item>
+              <layout class="QHBoxLayout" name="topFwInstalled">
+               <item>
+                <widget class="QLabel" name="iconFwInstalled">
+                 <property name="minimumSize">
+                  <size>
+                   <width>36</width>
+                   <height>36</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>36</width>
+                   <height>36</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="pixmap">
+                  <pixmap resource="../resources.qrc">:/rec/resources/Firewall.png</pixmap>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
+                 </property>
+                 <property name="icon" stdset="0">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="spFwInstalled">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLabel" name="statusFwInstalled">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>22</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Не проверено</string>
+                 </property>
+                 <property name="pill" stdset="0">
+                  <bool>true</bool>
+                 </property>
+                 <property name="state" stdset="0">
+                  <string>none</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QLabel" name="titleFwInstalled">
+               <property name="text">
+                <string>Наличие МЭ</string>
+               </property>
+               <property name="cardTitle" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="descFwInstalled">
+               <property name="text">
+                <string>Поиск межсетевого экрана</string>
+               </property>
+               <property name="wordWrap">
+                <bool>true</bool>
+               </property>
+               <property name="cardDesc" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="vspFwInstalled">
+               <property name="orientation">
+                <enum>Qt::Orientation::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnCheckFwInstalled">
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
+               <property name="text">
+                <string>Проверить</string>
+               </property>
+               <property name="cardButton" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFrame" name="cardFwWorking">
+            <property name="minimumSize">
+             <size>
+              <width>200</width>
+              <height>150</height>
+             </size>
+            </property>
+            <property name="card" stdset="0">
+             <bool>true</bool>
+            </property>
+            <property name="state" stdset="0">
+             <string>none</string>
+            </property>
+            <layout class="QVBoxLayout" name="layFwWorking">
+             <property name="spacing">
+              <number>6</number>
+             </property>
+             <property name="leftMargin">
+              <number>14</number>
+             </property>
+             <property name="topMargin">
+              <number>12</number>
+             </property>
+             <property name="rightMargin">
+              <number>14</number>
+             </property>
+             <property name="bottomMargin">
+              <number>12</number>
+             </property>
+             <item>
+              <layout class="QHBoxLayout" name="topFwWorking">
+               <item>
+                <widget class="QLabel" name="iconFwWorking">
+                 <property name="minimumSize">
+                  <size>
+                   <width>36</width>
+                   <height>36</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>36</width>
+                   <height>36</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="pixmap">
+                  <pixmap resource="../resources.qrc">:/rec/resources/WorkFirewall.png</pixmap>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
+                 </property>
+                 <property name="icon" stdset="0">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="spFwWorking">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLabel" name="statusFwWorking">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>22</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Не проверено</string>
+                 </property>
+                 <property name="pill" stdset="0">
+                  <bool>true</bool>
+                 </property>
+                 <property name="state" stdset="0">
+                  <string>none</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QLabel" name="titleFwWorking">
+               <property name="text">
+                <string>Работа МЭ</string>
+               </property>
+               <property name="cardTitle" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="descFwWorking">
+               <property name="text">
+                <string>Запрос к запрещённому узлу</string>
+               </property>
+               <property name="wordWrap">
+                <bool>true</bool>
+               </property>
+               <property name="cardDesc" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="vspFwWorking">
+               <property name="orientation">
+                <enum>Qt::Orientation::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnCheckFwWorking">
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
+               <property name="text">
+                <string>Проверить</string>
+               </property>
+               <property name="cardButton" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QFrame" name="cardAvInstalled">
+            <property name="minimumSize">
+             <size>
+              <width>200</width>
+              <height>150</height>
+             </size>
+            </property>
+            <property name="card" stdset="0">
+             <bool>true</bool>
+            </property>
+            <property name="state" stdset="0">
+             <string>none</string>
+            </property>
+            <layout class="QVBoxLayout" name="layAvInstalled">
+             <property name="spacing">
+              <number>6</number>
+             </property>
+             <property name="leftMargin">
+              <number>14</number>
+             </property>
+             <property name="topMargin">
+              <number>12</number>
+             </property>
+             <property name="rightMargin">
+              <number>14</number>
+             </property>
+             <property name="bottomMargin">
+              <number>12</number>
+             </property>
+             <item>
+              <layout class="QHBoxLayout" name="topAvInstalled">
+               <item>
+                <widget class="QLabel" name="iconAvInstalled">
+                 <property name="minimumSize">
+                  <size>
+                   <width>36</width>
+                   <height>36</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>36</width>
+                   <height>36</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="pixmap">
+                  <pixmap resource="../resources.qrc">:/rec/resources/Security.png</pixmap>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
+                 </property>
+                 <property name="icon" stdset="0">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="spAvInstalled">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLabel" name="statusAvInstalled">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>22</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Не проверено</string>
+                 </property>
+                 <property name="pill" stdset="0">
+                  <bool>true</bool>
+                 </property>
+                 <property name="state" stdset="0">
+                  <string>none</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QLabel" name="titleAvInstalled">
+               <property name="text">
+                <string>Наличие антивируса</string>
+               </property>
+               <property name="cardTitle" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="descAvInstalled">
+               <property name="text">
+                <string>Поиск антивирусного ПО</string>
+               </property>
+               <property name="wordWrap">
+                <bool>true</bool>
+               </property>
+               <property name="cardDesc" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="vspAvInstalled">
+               <property name="orientation">
+                <enum>Qt::Orientation::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnCheckAvInstalled">
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
+               <property name="text">
+                <string>Проверить</string>
+               </property>
+               <property name="cardButton" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFrame" name="cardAvWorking">
+            <property name="minimumSize">
+             <size>
+              <width>200</width>
+              <height>150</height>
+             </size>
+            </property>
+            <property name="card" stdset="0">
+             <bool>true</bool>
+            </property>
+            <property name="state" stdset="0">
+             <string>none</string>
+            </property>
+            <layout class="QVBoxLayout" name="layAvWorking">
+             <property name="spacing">
+              <number>6</number>
+             </property>
+             <property name="leftMargin">
+              <number>14</number>
+             </property>
+             <property name="topMargin">
+              <number>12</number>
+             </property>
+             <property name="rightMargin">
+              <number>14</number>
+             </property>
+             <property name="bottomMargin">
+              <number>12</number>
+             </property>
+             <item>
+              <layout class="QHBoxLayout" name="topAvWorking">
+               <item>
+                <widget class="QLabel" name="iconAvWorking">
+                 <property name="minimumSize">
+                  <size>
+                   <width>36</width>
+                   <height>36</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>36</width>
+                   <height>36</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="pixmap">
+                  <pixmap resource="../resources.qrc">:/rec/resources/Virus.png</pixmap>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
+                 </property>
+                 <property name="icon" stdset="0">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="spAvWorking">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLabel" name="statusAvWorking">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>22</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Не проверено</string>
+                 </property>
+                 <property name="pill" stdset="0">
+                  <bool>true</bool>
+                 </property>
+                 <property name="state" stdset="0">
+                  <string>none</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QLabel" name="titleAvWorking">
+               <property name="text">
+                <string>Тест EICAR</string>
+               </property>
+               <property name="cardTitle" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="descAvWorking">
+               <property name="text">
+                <string>Проверка резидентного монитора</string>
+               </property>
+               <property name="wordWrap">
+                <bool>true</bool>
+               </property>
+               <property name="cardDesc" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="vspAvWorking">
+               <property name="orientation">
+                <enum>Qt::Orientation::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnCheckAvWorking">
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
+               <property name="text">
+                <string>Проверить</string>
+               </property>
+               <property name="cardButton" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="pageLog">
+       <layout class="QVBoxLayout" name="logPageLayout">
+        <property name="spacing">
+         <number>12</number>
+        </property>
+        <property name="leftMargin">
+         <number>18</number>
+        </property>
+        <property name="topMargin">
+         <number>18</number>
+        </property>
+        <property name="rightMargin">
+         <number>18</number>
+        </property>
+        <property name="bottomMargin">
+         <number>18</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="logPageTitle">
+          <property name="text">
+           <string>Журнал событий</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPlainTextEdit" name="logText">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="logButtons">
+          <item>
+           <spacer name="logBtnSpacer">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnClearLog">
+            <property name="text">
+             <string>Очистить журнал</string>
+            </property>
+            <property name="icon">
+             <iconset theme="QIcon::ThemeIcon::EditClear"/>
+            </property>
+            <property name="secondary" stdset="0">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="pageReport">
+       <layout class="QVBoxLayout" name="reportPageLayout">
+        <property name="spacing">
+         <number>12</number>
+        </property>
+        <property name="leftMargin">
+         <number>18</number>
+        </property>
+        <property name="topMargin">
+         <number>18</number>
+        </property>
+        <property name="rightMargin">
+         <number>18</number>
+        </property>
+        <property name="bottomMargin">
+         <number>18</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="reportPageTitle">
+          <property name="text">
+           <string>Отчёт о проверке</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTextBrowser" name="reportView">
+          <property name="placeholderText">
+           <string>Нажмите «Сформировать отчёт», чтобы вывести результаты всех проверок</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="reportButtons">
+          <item>
+           <spacer name="reportBtnSpacer">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnBuildReport">
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
+            <property name="text">
+             <string>Сформировать отчёт</string>
+            </property>
+            <property name="icon">
+             <iconset theme="QIcon::ThemeIcon::DocumentNew"/>
+            </property>
+            <property name="secondary" stdset="0">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnSaveReport">
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
+            <property name="text">
+             <string>Сохранить в файл</string>
+            </property>
+            <property name="icon">
+             <iconset theme="QIcon::ThemeIcon::DocumentSave"/>
+            </property>
+            <property name="secondary" stdset="0">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources>
   <include location="../resources.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>btnExit</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>90</x>
+     <y>640</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>500</x>
+     <y>340</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

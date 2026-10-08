@@ -1,5 +1,13 @@
 <RCC>
     <qresource prefix="/rec">
         <file>resources/appIcon.png</file>
+        <file>resources/Firewall.png</file>
+        <file>resources/Home.png</file>
+        <file>resources/Log.png</file>
+        <file>resources/Net.png</file>
+        <file>resources/Report.png</file>
+        <file>resources/Security.png</file>
+        <file>resources/Virus.png</file>
+        <file>resources/WorkFirewall.png</file>
     </qresource>
 </RCC>

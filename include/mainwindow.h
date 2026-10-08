@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QFrame>
+#include <QLabel>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -19,5 +21,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+    void setCardState(QFrame *card, QLabel *pill, const QString &state, const QString &text);
 };
 #endif // MAINWINDOW_H
