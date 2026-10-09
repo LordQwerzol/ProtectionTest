@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QStyle>
 #include <QTime>
+#include <QTimer>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -16,6 +17,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->btnCheckAvInstalled, &QPushButton::clicked, this, &MainWindow::checkAntivirusInstalled);
     connect(ui->btnCheckFwWorking, &QPushButton::clicked, this, &MainWindow::checkFirewallWorking);
     connect(ui->btnCheckAvWorking, &QPushButton::clicked, this, &MainWindow::checkAntivirusWorking);
+    connect(ui->btnRunAll,      &QPushButton::clicked, this, &MainWindow::runAllChecks);
+    connect(ui->btnBuildReport, &QPushButton::clicked, this, &MainWindow::buildReport);
+    connect(ui->btnSaveReport,  &QPushButton::clicked, this, &MainWindow::saveReport);
+
+    ui->reportView->setStyleSheet("font-family: \"Segoe UI\"; font-size: 10pt;");
 }
 
 MainWindow::~MainWindow()
@@ -70,4 +76,58 @@ void MainWindow::setCardState(QFrame *card, QLabel *pill, const QString &state, 
         w->style()->polish(w);
     }
     pill->setText(text);
+}
+
+// Устоновка возможности прожимания кнопки
+void MainWindow::setChecksEnabled(bool enabled)
+{
+    for (QPushButton *b : {ui->btnCheckNet, ui->btnCheckFwInstalled, ui->btnCheckFwWorking,
+                           ui->btnCheckAvInstalled, ui->btnCheckAvWorking, ui->btnRunAll})
+        b->setEnabled(enabled);
+}
+
+// Запуск полной проверки
+void MainWindow::runAllChecks()
+{
+    if (m_runningAll)
+        return;
+
+    m_results.clear();
+    m_queue = {
+        [this] { checkInternet(); },
+        [this] { checkFirewallInstalled(); },
+        [this] { checkFirewallWorking(); },
+        [this] { checkAntivirusInstalled(); },
+        [this] { checkAntivirusWorking(); },
+    };
+    m_queueTotal = m_queue.size();
+    m_runningAll = true;
+
+    addLog("=== Запущена полная проверка ===");
+    startNextCheck();
+}
+
+// Запуск следующей в очереди проверки
+void MainWindow::startNextCheck()
+{
+    if (m_queue.isEmpty()) {
+        m_runningAll = false;
+        setChecksEnabled(true);
+        addLog("=== Полная проверка завершена ===");
+        return;
+    }
+
+    setChecksEnabled(false);
+    const auto next = m_queue.takeFirst();
+    // через очередь событий, чтобы синхронные проверки не вызывали рекурсию
+    QTimer::singleShot(0, this, next);
+}
+
+// Обновление карточки или продолжение
+void MainWindow::onCheckFinished()
+{
+    updateSummary();
+    if (m_runningAll) {
+        startNextCheck();
+    }
 }

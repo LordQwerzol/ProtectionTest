@@ -1188,13 +1188,6 @@ QToolTip { background: #232a36; color: #e5e7eb; border: 1px solid #343c4a; }</st
          <number>18</number>
         </property>
         <item>
-         <widget class="QLabel" name="reportPageTitle">
-          <property name="text">
-           <string>Отчёт о проверке</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QTextBrowser" name="reportView">
           <property name="placeholderText">
            <string>Нажмите «Сформировать отчёт», чтобы вывести результаты всех проверок</string>
@@ -1268,12 +1261,28 @@ QToolTip { background: #232a36; color: #e5e7eb; border: 1px solid #343c4a; }</st
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>90</x>
-     <y>640</y>
+     <x>99</x>
+     <y>610</y>
     </hint>
     <hint type="destinationlabel">
      <x>500</x>
      <y>340</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnClearLog</sender>
+   <signal>clicked()</signal>
+   <receiver>logText</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>803</x>
+     <y>581</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>741</x>
+     <y>453</y>
     </hint>
    </hints>
   </connection>

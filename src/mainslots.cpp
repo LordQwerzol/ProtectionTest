@@ -14,8 +14,6 @@
 #include <algorithm>
 #include <memory>
 
-
-
 // Строка EICAR хранится задом наперёд, чтобы антивирус не принял
 // за вирус сам ProtectionTest.exe. Разворачивается только в момент теста.
 static QByteArray eicarTestString()
@@ -46,7 +44,7 @@ void MainWindow::checkInternet()
         ui->descNet->setText(details);
         m_results["Подключение к Интернету"] = ok;
         addLog("Подключение к Интернету: " + details);
-        updateSummary();
+        onCheckFinished();
 
         sock->deleteLater();
     };
@@ -106,7 +104,7 @@ void MainWindow::checkFirewallInstalled()
 
     m_results["Наличие МЭ"] = protectedNow;
     addLog("Наличие МЭ: " + (found.isEmpty() ? QString("не найден") : found.join("; ")));
-    updateSummary();
+    onCheckFinished();
 }
 
 void MainWindow::checkAntivirusInstalled()
@@ -118,7 +116,7 @@ void MainWindow::checkAntivirusInstalled()
         ui->descAvInstalled->setText("Не удалось опросить Центр безопасности");
         m_results["Наличие антивируса"] = false;
         addLog("Наличие антивируса: " + sc.error);
-        updateSummary();
+        onCheckFinished();
         return;
     }
 
@@ -139,7 +137,7 @@ void MainWindow::checkAntivirusInstalled()
     addLog("Наличие антивируса: " + (names.isEmpty() ? QString("не найден") : names.join("; ")));
     if (outdated)
         addLog("Рекомендация: обновите антивирусные базы");
-    updateSummary();
+    onCheckFinished();
 }
 
 void MainWindow::checkFirewallWorking()
@@ -159,7 +157,7 @@ void MainWindow::checkFirewallWorking()
     m_results["Работа МЭ"] = ok;
     addLog("Работа МЭ: " + (ok ? QString("службы запущены, входящие по умолчанию блокируются")
                                : problems.join("; ")));
-    updateSummary();
+    onCheckFinished();
 }
 
 void MainWindow::checkAntivirusWorking()
@@ -176,7 +174,7 @@ void MainWindow::checkAntivirusWorking()
         addLog("Работа антивируса: " + log);
         if (!ok)
             addLog("Рекомендация: включите защиту файлов в реальном времени в настройках антивируса");
-        updateSummary();
+        onCheckFinished();
         ui->btnCheckAvWorking->setEnabled(true);
     };
 

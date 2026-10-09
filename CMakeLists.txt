@@ -15,6 +15,7 @@ qt_add_executable(ProtectionTest
     src/main.cpp
     src/mainwindow.cpp
     src/mainslots.cpp
+    src/report.cpp
     src/securitycenter.cpp
     src/util.cpp
     include/mainwindow.h 
