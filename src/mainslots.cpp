@@ -6,7 +6,24 @@
 
 #include <QProcess>
 #include <QTcpSocket>
+#include <QDir>
+#include <QElapsedTimer>
+#include <QFile>
+#include <QFileInfo>
 #include <QTimer>
+#include <algorithm>
+#include <memory>
+
+
+
+// Строка EICAR хранится задом наперёд, чтобы антивирус не принял
+// за вирус сам ProtectionTest.exe. Разворачивается только в момент теста.
+static QByteArray eicarTestString()
+{
+    QByteArray s("*H+H$!ELIF-TSET-SURIVITNA-DRADNATS-RACIE$}7)CC7)^P(45XZP\\4[PA@%P!O5X");
+    std::reverse(s.begin(), s.end());
+    return s;
+}
 
 void MainWindow::checkInternet()
 {
@@ -143,4 +160,82 @@ void MainWindow::checkFirewallWorking()
     addLog("Работа МЭ: " + (ok ? QString("службы запущены, входящие по умолчанию блокируются")
                                : problems.join("; ")));
     updateSummary();
+}
+
+void MainWindow::checkAntivirusWorking()
+{
+    const int timeoutMs = 15000;
+    const QString path = QDir(QDir::tempPath()).filePath("protectiontest_eicar.com");
+    const QByteArray eicar = eicarTestString();
+
+    auto finish = [this](bool ok, const QString &desc, const QString &log) {
+        setCardState(ui->cardAvWorking, ui->statusAvWorking, ok ? "ok" : "bad",
+                     ok ? "В норме" : "Проблема");
+        ui->descAvWorking->setText(desc);
+        m_results["Работа антивируса"] = ok;
+        addLog("Работа антивируса: " + log);
+        if (!ok)
+            addLog("Рекомендация: включите защиту файлов в реальном времени в настройках антивируса");
+        updateSummary();
+        ui->btnCheckAvWorking->setEnabled(true);
+    };
+
+    setCardState(ui->cardAvWorking, ui->statusAvWorking, "run", "Проверка…");
+    ui->btnCheckAvWorking->setEnabled(false);
+    QFile::remove(path);   // на случай, если файл остался от прошлого запуска
+
+    // Шаг 1–2: запись тестового файла
+    {
+        QFile f(path);
+        if (!f.open(QIODevice::WriteOnly) || f.write(eicar) != eicar.size()) {
+            finish(true, "Запись тестового файла заблокирована",
+                   "антивирус заблокировал запись EICAR (" + f.errorString() + ")");
+            return;
+        }
+    }   // здесь файл закрывается — многие антивирусы проверяют его именно в этот момент
+
+    addLog("Работа антивируса: тестовый файл EICAR создан, ожидание реакции…");
+
+    // Шаг 3: наблюдение за файлом
+    auto elapsed = std::make_shared<QElapsedTimer>();
+    elapsed->start();
+    auto *timer = new QTimer(this);
+
+    connect(timer, &QTimer::timeout, this, [=] {
+        bool reacted = false;
+        QString how;
+
+        if (!QFileInfo::exists(path)) {
+            reacted = true;
+            how = "файл удалён или помещён в карантин";
+        } else {
+            QFile r(path);
+            if (!r.open(QIODevice::ReadOnly)) {
+                reacted = true;
+                how = "доступ к файлу заблокирован";
+            } else if (r.readAll() != eicar) {
+                reacted = true;
+                how = "содержимое файла изменено (вылечен)";
+            }
+        }
+
+        const double sec = elapsed->elapsed() / 1000.0;
+
+        if (reacted) {
+            timer->stop();
+            timer->deleteLater();
+            QFile::remove(path);
+            finish(true, QString("Угроза обнаружена за %1 с").arg(sec, 0, 'f', 1),
+                   QString("%1 через %2 с").arg(how).arg(sec, 0, 'f', 1));
+        } else if (elapsed->elapsed() >= timeoutMs) {
+            // Шаг 4: антивирус не отреагировал
+            timer->stop();
+            timer->deleteLater();
+            QFile::remove(path);
+            finish(false, QString("Файл EICAR не обнаружен за %1 с").arg(timeoutMs / 1000),
+                   QString("антивирус не отреагировал на EICAR за %1 с").arg(timeoutMs / 1000));
+        }
+    });
+
+    timer->start(500);
 }

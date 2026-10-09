@@ -25,6 +25,7 @@ private slots:
     void checkFirewallInstalled();
     void checkAntivirusInstalled();
     void checkFirewallWorking();
+    void checkAntivirusWorking();
 
 private:
     Ui::MainWindow *ui;
