@@ -39,3 +39,56 @@ FirewallStatus queryWindowsFirewall()
         CoUninitialize();
     return st;
 }
+
+static bool isServiceRunning(const wchar_t *serviceName)
+{
+    SC_HANDLE scm = OpenSCManagerW(nullptr, nullptr, SC_MANAGER_CONNECT);
+    if (!scm) return false;
+
+    bool running = false;
+    SC_HANDLE svc = OpenServiceW(scm, serviceName, SERVICE_QUERY_STATUS);
+    if (svc) {
+        SERVICE_STATUS_PROCESS ssp{};
+        DWORD needed = 0;
+        if (QueryServiceStatusEx(svc, SC_STATUS_PROCESS_INFO,
+                                 reinterpret_cast<LPBYTE>(&ssp), sizeof(ssp), &needed))
+            running = (ssp.dwCurrentState == SERVICE_RUNNING);
+        CloseServiceHandle(svc);
+    }
+    CloseServiceHandle(scm);
+    return running;
+}
+
+FirewallEnforcement queryFirewallEnforcement()
+{
+    FirewallEnforcement r;
+    r.serviceRunning = isServiceRunning(L"mpssvc");   // служба «Брандмауэр Защитника Windows»
+    r.bfeRunning     = isServiceRunning(L"BFE");      // служба базовой фильтрации (WFP)
+
+    const HRESULT hrInit = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+    const bool needUninit = SUCCEEDED(hrInit);
+
+    INetFwPolicy2 *policy = nullptr;
+    if (SUCCEEDED(CoCreateInstance(kClsidNetFwPolicy2, nullptr, CLSCTX_INPROC_SERVER,
+                                   kIidINetFwPolicy2, reinterpret_cast<void **>(&policy)))) {
+        long active = 0;
+        policy->get_CurrentProfileTypes(&active);
+        r.queried = true;
+        r.inboundBlockedByDefault = true;
+
+        for (NET_FW_PROFILE_TYPE2 profile : {NET_FW_PROFILE2_DOMAIN,
+                                             NET_FW_PROFILE2_PRIVATE,
+                                             NET_FW_PROFILE2_PUBLIC}) {
+            if (!(active & profile)) continue;   // смотрим только активные сети
+
+            NET_FW_ACTION action = NET_FW_ACTION_ALLOW;
+            if (FAILED(policy->get_DefaultInboundAction(profile, &action))
+                || action != NET_FW_ACTION_BLOCK)
+                r.inboundBlockedByDefault = false;
+        }
+        policy->Release();
+    }
+
+    if (needUninit) CoUninitialize();
+    return r;
+}

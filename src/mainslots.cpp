@@ -124,3 +124,23 @@ void MainWindow::checkAntivirusInstalled()
         addLog("Рекомендация: обновите антивирусные базы");
     updateSummary();
 }
+
+void MainWindow::checkFirewallWorking()
+{
+    const FirewallEnforcement fe = queryFirewallEnforcement();
+
+    QStringList problems;
+    if (!fe.queried)                 problems << "нет доступа к настройкам брандмауэра";
+    if (!fe.serviceRunning)          problems << "служба брандмауэра (mpssvc) остановлена";
+    if (!fe.bfeRunning)              problems << "служба фильтрации (BFE) остановлена";
+    if (!fe.inboundBlockedByDefault) problems << "входящие соединения по умолчанию разрешены";
+
+    const bool ok = problems.isEmpty();
+    setCardState(ui->cardFwWorking, ui->statusFwWorking, ok ? "ok" : "bad", ok ? "В норме" : "Проблема");
+    ui->descFwWorking->setText(ok ? "Фильтрация активна, входящие блокируются" : problems.first());
+
+    m_results["Работа МЭ"] = ok;
+    addLog("Работа МЭ: " + (ok ? QString("службы запущены, входящие по умолчанию блокируются")
+                               : problems.join("; ")));
+    updateSummary();
+}

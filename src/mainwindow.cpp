@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->btnCheckNet, &QPushButton::clicked, this, &MainWindow::checkInternet);
     connect(ui->btnCheckFwInstalled, &QPushButton::clicked, this, &MainWindow::checkFirewallInstalled);
     connect(ui->btnCheckAvInstalled, &QPushButton::clicked, this, &MainWindow::checkAntivirusInstalled);
+    connect(ui->btnCheckFwWorking, &QPushButton::clicked, this, &MainWindow::checkFirewallWorking);
 }
 
 MainWindow::~MainWindow()

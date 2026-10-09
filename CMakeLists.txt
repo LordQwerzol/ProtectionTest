@@ -45,7 +45,7 @@ if(MSVC)
 endif()
 
 if (WIN32)
-    target_link_libraries(ProtectionTest PRIVATE ole32 oleaut32 wbemuuid)
+    target_link_libraries(ProtectionTest PRIVATE ole32 oleaut32 wbemuuid advapi32)
 endif()
 
 install(TARGETS ProtectionTest
