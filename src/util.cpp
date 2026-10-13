@@ -6,6 +6,8 @@ static const CLSID kClsidNetFwPolicy2 =
 static const IID kIidINetFwPolicy2 =
     {0x98325047, 0xC671, 0x4174, {0x8D, 0x81, 0xDE, 0xFC, 0xD3, 0xF0, 0x31, 0x86}};
 
+// Имя правила, которое заранее создаётся командой netsh
+const wchar_t *const kCheckRuleName = L"ProtectionTest Block";
 
 FirewallStatus queryWindowsFirewall()
 {
@@ -40,55 +42,70 @@ FirewallStatus queryWindowsFirewall()
     return st;
 }
 
-static bool isServiceRunning(const wchar_t *serviceName)
+TestRuleInfo queryTestRule()
 {
-    SC_HANDLE scm = OpenSCManagerW(nullptr, nullptr, SC_MANAGER_CONNECT);
-    if (!scm) return false;
-
-    bool running = false;
-    SC_HANDLE svc = OpenServiceW(scm, serviceName, SERVICE_QUERY_STATUS);
-    if (svc) {
-        SERVICE_STATUS_PROCESS ssp{};
-        DWORD needed = 0;
-        if (QueryServiceStatusEx(svc, SC_STATUS_PROCESS_INFO,
-                                 reinterpret_cast<LPBYTE>(&ssp), sizeof(ssp), &needed))
-            running = (ssp.dwCurrentState == SERVICE_RUNNING);
-        CloseServiceHandle(svc);
-    }
-    CloseServiceHandle(scm);
-    return running;
-}
-
-FirewallEnforcement queryFirewallEnforcement()
-{
-    FirewallEnforcement r;
-    r.serviceRunning = isServiceRunning(L"mpssvc");   // служба «Брандмауэр Защитника Windows»
-    r.bfeRunning     = isServiceRunning(L"BFE");      // служба базовой фильтрации (WFP)
+    TestRuleInfo info;
 
     const HRESULT hrInit = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
     const bool needUninit = SUCCEEDED(hrInit);
 
     INetFwPolicy2 *policy = nullptr;
-    if (SUCCEEDED(CoCreateInstance(kClsidNetFwPolicy2, nullptr, CLSCTX_INPROC_SERVER,
-                                   kIidINetFwPolicy2, reinterpret_cast<void **>(&policy)))) {
-        long active = 0;
-        policy->get_CurrentProfileTypes(&active);
-        r.queried = true;
-        r.inboundBlockedByDefault = true;
+    INetFwRules   *rules  = nullptr;
+    INetFwRule    *rule   = nullptr;
 
-        for (NET_FW_PROFILE_TYPE2 profile : {NET_FW_PROFILE2_DOMAIN,
-                                             NET_FW_PROFILE2_PRIVATE,
-                                             NET_FW_PROFILE2_PUBLIC}) {
-            if (!(active & profile)) continue;   // смотрим только активные сети
+    HRESULT hr = CoCreateInstance(kClsidNetFwPolicy2, nullptr, CLSCTX_INPROC_SERVER,
+                                  kIidINetFwPolicy2, reinterpret_cast<void **>(&policy));
+    if (FAILED(hr)) {
+        info.error = "нет доступа к брандмауэру Windows";
+    } else if (FAILED(policy->get_Rules(&rules))) {
+        info.error = "не удалось получить список правил";
+    } else {
+        BSTR name = SysAllocString(kCheckRuleName);
+        hr = rules->Item(name, &rule);
+        SysFreeString(name);
+
+        if (FAILED(hr) || !rule) {
+            info.error = "тестовое правило не найдено";
+        } else {
+            info.found = true;
+
+            VARIANT_BOOL enabled = VARIANT_FALSE;
+            rule->get_Enabled(&enabled);
+            info.enabled = (enabled == VARIANT_TRUE);
+
+            NET_FW_RULE_DIRECTION dir = NET_FW_RULE_DIR_IN;
+            rule->get_Direction(&dir);
+            info.outbound = (dir == NET_FW_RULE_DIR_OUT);
 
             NET_FW_ACTION action = NET_FW_ACTION_ALLOW;
-            if (FAILED(policy->get_DefaultInboundAction(profile, &action))
-                || action != NET_FW_ACTION_BLOCK)
-                r.inboundBlockedByDefault = false;
+            rule->get_Action(&action);
+            info.block = (action == NET_FW_ACTION_BLOCK);
+
+            // RemoteAddresses приходит в виде "1.1.1.1/255.255.255.255" —
+            // берём только сам адрес (первый, если их несколько)
+            BSTR addr = nullptr;
+            if (SUCCEEDED(rule->get_RemoteAddresses(&addr)) && addr) {
+                std::wstring a(addr);
+                a = a.substr(0, a.find_first_of(L"/,"));
+                if (a != L"*")
+                    info.remoteAddress = QString::fromWCharArray(a.c_str());
+                SysFreeString(addr);
+            }
+
+            // RemotePorts — "80"; диапазоны и списки для теста не подходят
+            BSTR ports = nullptr;
+            if (SUCCEEDED(rule->get_RemotePorts(&ports)) && ports) {
+                const std::wstring p(ports);
+                if (!p.empty() && p.find_first_not_of(L"0123456789") == std::wstring::npos)
+                    info.remotePort = static_cast<quint16>(std::wcstol(p.c_str(), nullptr, 10));
+                SysFreeString(ports);
+            }
         }
-        policy->Release();
     }
 
+    if (rule)   rule->Release();
+    if (rules)  rules->Release();
+    if (policy) policy->Release();
     if (needUninit) CoUninitialize();
-    return r;
+    return info;
 }

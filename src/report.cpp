@@ -14,8 +14,6 @@
 #include <QTextStream>
 #include <QTextTable>
 
-// ===================== Отчёт =====================
-
 namespace {
 struct ReportItem {
     QString key;             // ключ в m_results
@@ -39,7 +37,8 @@ void MainWindow::buildReport()
         {"Наличие МЭ", ui->descFwInstalled,
          "Включите брандмауэр Windows или установите сторонний межсетевой экран."},
         {"Работа МЭ", ui->descFwWorking,
-         "Запустите службы mpssvc и BFE, установите блокировку входящих соединений по умолчанию."},
+         "Убедитесь, что тестовое правило «ProtectionTest Block» существует и включено, "
+         "а брандмауэр Windows включён для активной сети."},
         {"Наличие антивируса", ui->descAvInstalled,
          "Установите антивирус или включите Microsoft Defender, обновите базы."},
         {"Работа антивируса", ui->descAvWorking,

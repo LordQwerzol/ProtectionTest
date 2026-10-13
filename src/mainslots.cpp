@@ -23,44 +23,50 @@ static QByteArray eicarTestString()
     return s;
 }
 
-void MainWindow::checkInternet()
+// Асинхронная попытка TCP-подключения с таймаутом
+void MainWindow::probeTcp(const QString &host, quint16 port, int timeoutMs,
+                          std::function<void(bool, const QString &)> done)
 {
-    setCardState(ui->cardNet, ui->statusNet, "run", "Проверка…");
-
     auto *sock  = new QTcpSocket(this);
     auto *timer = new QTimer(sock);
     timer->setSingleShot(true);
 
-    // лямба-выражение для сокета
-    auto finish = [this, sock, timer](bool ok, const QString &details) 
-    {
-        if (sock->property("done").toBool())
-            return;
+    auto finish = [sock, timer, done](bool ok, const QString &details) {
+        if (sock->property("done").toBool()) return;
         sock->setProperty("done", true);
         timer->stop();
         sock->abort();
-
-        setCardState(ui->cardNet, ui->statusNet, ok ? "ok" : "bad", ok ? "В норме" : "Проблема");
-        ui->descNet->setText(details);
-        m_results["Подключение к Интернету"] = ok;
-        addLog("Подключение к Интернету: " + details);
-        onCheckFinished();
-
         sock->deleteLater();
+        done(ok, details);
     };
 
-    connect(sock, &QTcpSocket::connected, this, [finish] {
-        finish(true, "Соединение с 77.88.8.8:53 установлено");
-    });
-    connect(sock, &QTcpSocket::errorOccurred, this, [finish, sock] {
-        finish(false, "Ошибка: " + sock->errorString());
-    });
-    connect(timer, &QTimer::timeout, this, [finish] {
-        finish(false, "Нет ответа за 3 секунды");
-    });
+    connect(sock, &QTcpSocket::connected, this, [finish] { finish(true, "соединение установлено"); });
+    connect(sock, &QTcpSocket::errorOccurred, this, [finish, sock] { finish(false, sock->errorString()); });
+    connect(timer, &QTimer::timeout, this, [finish] { finish(false, "нет ответа"); });
 
-    timer->start(3000);
-    sock->connectToHost("77.88.8.8", 53);
+    timer->start(timeoutMs);
+    sock->connectToHost(host, port);
+}
+
+void MainWindow::checkInternet()
+{
+    const QString host = "77.88.8.8";
+    const quint16 port = 53;
+    const int timeoutMs = 3000;
+    const QString target = QString("%1:%2").arg(host).arg(port);
+
+    setCardState(ui->cardNet, ui->statusNet, "run", "Проверка…");
+
+    probeTcp(host, port, timeoutMs, [=](bool ok, const QString &details) {
+        const QString text = ok ? "Соединение с " + target + " установлено"
+                                : "Нет соединения с " + target + ": " + details;
+
+        setCardState(ui->cardNet, ui->statusNet, ok ? "ok" : "bad", ok ? "В норме" : "Проблема");
+        ui->descNet->setText(text);
+        m_results["Подключение к Интернету"] = ok;
+        addLog("Подключение к Интернету: " + text);
+        onCheckFinished();
+    });
 }
 
 void MainWindow::checkFirewallInstalled()
@@ -142,22 +148,55 @@ void MainWindow::checkAntivirusInstalled()
 
 void MainWindow::checkFirewallWorking()
 {
-    const FirewallEnforcement fe = queryFirewallEnforcement();
+    auto finishCard = [this](const QString &state, const QString &pill,
+                             const QString &desc, const QString &log, bool count, bool ok) {
+        setCardState(ui->cardFwWorking, ui->statusFwWorking, state, pill);
+        ui->descFwWorking->setText(desc);
+        addLog("Работа МЭ: " + log);
+        if (count) m_results["Работа МЭ"] = ok;
+        onCheckFinished();
+    };
 
-    QStringList problems;
-    if (!fe.queried)                 problems << "нет доступа к настройкам брандмауэра";
-    if (!fe.serviceRunning)          problems << "служба брандмауэра (mpssvc) остановлена";
-    if (!fe.bfeRunning)              problems << "служба фильтрации (BFE) остановлена";
-    if (!fe.inboundBlockedByDefault) problems << "входящие соединения по умолчанию разрешены";
+    setCardState(ui->cardFwWorking, ui->statusFwWorking, "run", "Проверка…");
 
-    const bool ok = problems.isEmpty();
-    setCardState(ui->cardFwWorking, ui->statusFwWorking, ok ? "ok" : "bad", ok ? "В норме" : "Проблема");
-    ui->descFwWorking->setText(ok ? "Фильтрация активна, входящие блокируются" : problems.first());
+    // 1. Читаем заранее созданное правило (только чтение)
+    const TestRuleInfo rule = queryTestRule();
+    if (!rule.found) {
+        finishCard("bad", "Нет правила", "Тестовое правило «ProtectionTest Block» не найдено",
+                   rule.error, true, false);
+        return;
+    }
+    if (!rule.outbound || !rule.block || rule.remoteAddress.isEmpty() || rule.remotePort == 0) {
+        finishCard("bad", "Ошибка", "Правило настроено неверно",
+                   "правило должно быть исходящим, блокирующим, с одним адресом и портом",
+                   true, false);
+        return;
+    }
 
-    m_results["Работа МЭ"] = ok;
-    addLog("Работа МЭ: " + (ok ? QString("службы запущены, входящие по умолчанию блокируются")
-                               : problems.join("; ")));
-    onCheckFinished();
+    const QString target = QString("%1:%2").arg(rule.remoteAddress).arg(rule.remotePort);
+    addLog(QString("Работа МЭ: правило найдено (%1), цель %2")
+               .arg(rule.enabled ? "включено" : "выключено", target));
+
+    // 2. Попытка подключиться к запрещённому узлу
+    probeTcp(rule.remoteAddress, rule.remotePort, 3000,
+             [=](bool connected, const QString &details) {
+        if (rule.enabled && !connected)
+            finishCard("ok", "В норме", "Соединение с " + target + " заблокировано правилом",
+                       "ограничение действует, соединение заблокировано (" + details + ")",
+                       true, true);
+        else if (rule.enabled && connected)
+            finishCard("bad", "Проблема", "Правило включено, но соединение прошло",
+                       "МЭ не применяет правило: соединение с " + target + " установлено",
+                       true, false);
+        else if (!rule.enabled && connected)
+            finishCard("bad", "Правило выкл.", "Ограничение не действует: правило отключено",
+                       "правило отключено, соединение с " + target + " установлено",
+                       true, false);
+        else
+            finishCard("none", "Неясно", "Узел недоступен даже без правила",
+                       "правило отключено, но соединение не установлено (" + details +
+                       ") — проверьте Интернет", false, false);
+    });
 }
 
 void MainWindow::checkAntivirusWorking()

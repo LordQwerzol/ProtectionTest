@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    setFixedSize(QSize(930, 680));
     connect(ui->navOverview, &QPushButton::clicked, this, [this]{ ui->pages->setCurrentIndex(0); });
     connect(ui->navLog,      &QPushButton::clicked, this, [this]{ ui->pages->setCurrentIndex(1); });
     connect(ui->navReport,   &QPushButton::clicked, this, [this]{ ui->pages->setCurrentIndex(2); });

@@ -42,6 +42,8 @@ private:
     void setChecksEnabled(bool enabled);  
     void styleReportTables();
     bool writeReport(const QString &path, QString *error = nullptr);
+    void probeTcp(const QString &host, quint16 port, int timeoutMs,
+              std::function<void(bool connected, const QString &details)> done);
     
     // Переменная для отчета 
     QMap<QString, bool> m_results;

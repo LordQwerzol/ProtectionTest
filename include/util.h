@@ -6,6 +6,7 @@
 #include <windows.h>
 #include <netfw.h>
 #include <QString>
+#include <string>
 
 // Состояние встроенного брандмауэра Windows
 struct FirewallStatus {
@@ -20,16 +21,16 @@ struct FirewallStatus {
 // Запрос через INetFwPolicy2 для проверки встроенного брандмауэра Windows
 FirewallStatus queryWindowsFirewall();
 
-// «Работает ли брандмауэр на самом деле» — только чтение, без изменений
-struct FirewallEnforcement {
-    bool queried = false;
-    bool serviceRunning = false;          // служба mpssvc запущена
-    bool bfeRunning = false;              // служба BFE (платформа фильтрации) запущена
-    bool inboundBlockedByDefault = false; // входящие по умолчанию блокируются в активных сетях
-
-    bool effective() const {
-        return queried && serviceRunning && bfeRunning && inboundBlockedByDefault;
-    }
+// Тестовое правило брандмауэра, созданное заранее командой netsh.
+// Программа его только читает и ничего в брандмауэре не меняет.
+struct TestRuleInfo {
+    bool    found    = false;   // правило существует
+    bool    enabled  = false;   // правило включено
+    bool    outbound = false;   // направление — исходящее
+    bool    block    = false;   // действие — блокировать
+    QString remoteAddress;      // удалённый адрес из правила, например "1.1.1.1"
+    quint16 remotePort = 0;     // удалённый порт из правила, например 80
+    QString error;
 };
 
-FirewallEnforcement queryFirewallEnforcement();
+TestRuleInfo queryTestRule();
